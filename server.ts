@@ -6,10 +6,13 @@ import { RULES } from './src/rules';
 import { INITIAL_TAGGERS } from './src/taggers';
 import type { Phonology, TaggerDef } from './src/types';
 
+// ---- 嵌入资源（build:embed 生成）----
+import { ASSETS } from "./src/assets.gen.js";
+
 // ---- 预计算 22 个阶段 ----
-const tupaPath = ["./tupa.dict.yaml", "../tupa.dict.yaml"].find(p => fs.existsSync(p)) ?? "tupa.dict.yaml";
-const viewerPath = ["./viewer", "../viewer/dist"].find(p => fs.existsSync(p));
-const tupaText = fs.readFileSync(tupaPath, 'utf-8');
+const embedded = ASSETS.size > 0 ? ASSETS : null;
+const tupaText = embedded?.get("/__tupa.dict.yaml")?.data
+  ?? (() => { const p = ["./tupa.dict.yaml", "../tupa.dict.yaml"].find(p => fs.existsSync(p)) ?? "tupa.dict.yaml"; return fs.readFileSync(p, 'utf-8'); })();
 const base = parseTupa(tupaText);
 
 const stages: Phonology[] = [];
@@ -155,9 +158,18 @@ function rowLabelCells(rows: { key: string; labels: string[] }[]) {
 const app = express();
 app.use(express.json());
 
-// 生产模式：serve 前端静态文件
-if (viewerPath) {
-  app.use(express.static(viewerPath));
+// 前端静态文件
+if (embedded) {
+  app.use((req, res, next) => {
+    const path = req.path === "/" ? "/index.html" : req.path;
+    const asset = embedded!.get(path);
+    if (!asset) return next();
+    const body = asset.b64 ? Buffer.from(asset.data, "base64") : asset.data;
+    res.type(asset.mime).send(body);
+  });
+} else {
+  const viewerPath = ["./viewer", "../viewer/dist"].find(p => fs.existsSync(p));
+  if (viewerPath) app.use(express.static(viewerPath));
 }
 
 app.get('/api/stages', (_req, res) => {

@@ -8,19 +8,18 @@
     "viewer": "cd viewer && npx vite --host",
     "dev": "concurrently \"npm run server\" \"npm run viewer\"",
     "build:viewer": "cd viewer && npx vite build",
+    "build:embed": "node scripts/embed-assets.js",
     "build:server": "npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs --external:fsevents",
-    "build": "npm run build:viewer && npm run build:server",
+    "build": "npm run build:viewer && npm run build:embed && npm run build:server",
     "start": "node dist/server.cjs",
     "pack": "npm run build && npm run pack:copy",
-    "pack:copy": "node scripts/pack.js"
-  },
-  "pkg": {
-    "assets": ["tupa.dict.yaml", "viewer/dist/**/*"]
+    "pack:copy": "node scripts/pack.js",
+    "sea": "node scripts/sea-build.js"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "esbuild": "^0.28.0",
-    "pkg": "^5.8.1",
+    "postject": "^1.0.0-alpha.6",
     "tsx": "^4.0.0",
     "typescript": "^5.5.0"
   },

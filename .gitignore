@@ -5,6 +5,6 @@ dist/
 *.py
 OC_msoegDK.dict.yaml
 viewer/dist/
-dist/
+src/assets.gen.ts
 .DS_Store
 Thumbs.db
