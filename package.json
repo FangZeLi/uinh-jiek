@@ -14,7 +14,9 @@
     "build": "npm run build:viewer && npm run build:embed && npm run build:server",
     "start": "node dist/server.cjs",
     "electron:dev": "npm run build && npx electron .",
-    "electron:build": "npm run build && npx electron-builder"
+    "electron:build:win": "npm run build && npx electron-builder --win portable",
+    "electron:build:mac": "npm run build && npx electron-builder --mac",
+    "electron:build:linux": "npm run build && npx electron-builder --linux"
   },
   "build": {
     "appId": "com.inflegza.uinh-jiek",
