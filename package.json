@@ -1,8 +1,9 @@
 {
-  "name": "phonology-evolution",
+  "name": "uinh-jiek",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "server": "tsx server.ts",
     "viewer": "cd viewer && npx vite --host",
@@ -12,14 +13,36 @@
     "build:server": "npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs --external:fsevents",
     "build": "npm run build:viewer && npm run build:embed && npm run build:server",
     "start": "node dist/server.cjs",
-    "pack": "npm run build && npm run pack:copy",
-    "pack:copy": "node scripts/pack.js",
-    "sea": "node scripts/sea-build.js"
+    "electron:dev": "npm run build && npx electron .",
+    "electron:build": "npm run build && npx electron-builder"
+  },
+  "build": {
+    "appId": "com.inflegza.uinh-jiek",
+    "productName": "韵易",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/server.cjs"
+    ],
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "forceCodeSigning": false
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "electron": "^42.0.0",
+    "electron-builder": "^26.8.1",
     "esbuild": "^0.28.0",
-    "postject": "^1.0.0-alpha.6",
     "tsx": "^4.0.0",
     "typescript": "^5.5.0"
   },

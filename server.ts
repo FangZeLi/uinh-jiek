@@ -299,5 +299,10 @@ app.post('/api/trace', (req, res) => {
   res.json({ traces, ruleNames: RULES.map(r => r.name) });
 });
 
-const port = 8732;
-app.listen(port, () => console.log(`Server: http://localhost:${port}`));
+// 端口填零，让系统自动分配
+const httpServer = app.listen(0, () => {
+  const addr = httpServer.address() as any;
+  console.log(`Server: http://localhost:${addr.port}`);
+});
+
+export const port = () => (httpServer.address() as any)?.port ?? 0;

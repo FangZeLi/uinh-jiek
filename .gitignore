@@ -2,6 +2,7 @@ node_modules/
 *.log
 __pycache__/
 dist/
+release/
 *.py
 OC_msoegDK.dict.yaml
 viewer/dist/
