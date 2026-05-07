@@ -26,7 +26,8 @@
     },
     "files": [
       "electron/**/*",
-      "dist/server.cjs"
+      "dist/server.cjs",
+      "!electron/*.md"
     ],
     "win": {
       "target": "portable",

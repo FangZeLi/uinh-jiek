@@ -29,14 +29,7 @@ jobs:
           workflow_conclusion: success
           name: uinh-jiek-ubuntu-latest
           path: assets
-      - name: Collect executables
-        run: |
-          mkdir -p dist-release
-          find assets -name "*.exe" -exec cp {} dist-release/ \;
-          find assets -name "*.dmg" -exec cp {} dist-release/ \;
-          find assets -name "*.AppImage" -exec cp {} dist-release/ \;
-          ls -lh dist-release/
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist-release/*
+          files: assets/*
