@@ -7,7 +7,9 @@ import { INITIAL_TAGGERS } from './src/taggers';
 import type { Phonology, TaggerDef } from './src/types';
 
 // ---- 预计算 22 个阶段 ----
-const tupaText = fs.readFileSync('tupa.dict.yaml', 'utf-8');
+const tupaPath = ["./tupa.dict.yaml", "../tupa.dict.yaml"].find(p => fs.existsSync(p)) ?? "tupa.dict.yaml";
+const viewerPath = ["./viewer", "../viewer/dist"].find(p => fs.existsSync(p));
+const tupaText = fs.readFileSync(tupaPath, 'utf-8');
 const base = parseTupa(tupaText);
 
 const stages: Phonology[] = [];
@@ -152,6 +154,11 @@ function rowLabelCells(rows: { key: string; labels: string[] }[]) {
 // ---- Express ----
 const app = express();
 app.use(express.json());
+
+// 生产模式：serve 前端静态文件
+if (viewerPath) {
+  app.use(express.static(viewerPath));
+}
 
 app.get('/api/stages', (_req, res) => {
   res.json(stages.map((s, i) => ({

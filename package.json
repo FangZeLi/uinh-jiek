@@ -6,10 +6,21 @@
   "scripts": {
     "server": "tsx server.ts",
     "viewer": "cd viewer && npx vite --host",
-    "dev": "concurrently \"npm run server\" \"npm run viewer\""
+    "dev": "concurrently \"npm run server\" \"npm run viewer\"",
+    "build:viewer": "cd viewer && npx vite build",
+    "build:server": "npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs --external:fsevents",
+    "build": "npm run build:viewer && npm run build:server",
+    "start": "node dist/server.cjs",
+    "pack": "npm run build && npm run pack:copy",
+    "pack:copy": "node scripts/pack.js"
+  },
+  "pkg": {
+    "assets": ["tupa.dict.yaml", "viewer/dist/**/*"]
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "esbuild": "^0.28.0",
+    "pkg": "^5.8.1",
     "tsx": "^4.0.0",
     "typescript": "^5.5.0"
   },
