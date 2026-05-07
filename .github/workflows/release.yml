@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows build
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          workflow_conclusion: success
+          name: uinh-jiek-windows-latest
+          path: assets
+      - name: Download macOS build
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          workflow_conclusion: success
+          name: uinh-jiek-macos-latest
+          path: assets
+      - name: Download Linux build
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          workflow_conclusion: success
+          name: uinh-jiek-ubuntu-latest
+          path: assets
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: assets/**/*
