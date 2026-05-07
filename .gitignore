@@ -1,0 +1,9 @@
+node_modules/
+*.log
+__pycache__/
+*.py
+OC_msoegDK.dict.yaml
+viewer/dist/
+dist/
+.DS_Store
+Thumbs.db

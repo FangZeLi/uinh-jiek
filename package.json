@@ -1,0 +1,20 @@
+{
+  "name": "phonology-evolution",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "server": "tsx server.ts",
+    "viewer": "cd viewer && npx vite --host",
+    "dev": "concurrently \"npm run server\" \"npm run viewer\""
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "tsx": "^4.0.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "concurrently": "^9.0.0",
+    "express": "^4.21.0"
+  }
+}
