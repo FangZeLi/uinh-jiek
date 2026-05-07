@@ -1,9 +1,11 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
+const http = require("http");
 
-// Show splash window immediately
 let win;
-app.whenReady().then(() => {
+
+function createWindow() {
+  // Show splash immediately
   win = new BrowserWindow({
     width: 640,
     height: 400,
@@ -13,21 +15,27 @@ app.whenReady().then(() => {
   });
   win.loadFile(path.join(__dirname, "splash.html"));
 
-  // Start server in background
-  const { port } = require(path.join(__dirname, "..", "dist", "server.cjs"));
+  // Fork server in background (non-blocking)
+  const { fork } = require("child_process");
+  const serverPath = path.join(__dirname, "..", "dist", "server.cjs");
+  const child = fork(serverPath, [], { silent: true });
 
-  // Poll server until ready, then load app
-  const http = require("http");
-  function check(retries = 60) {
-    const p = port();
-    if (p > 0) {
-      http.get(`http://localhost:${p}/`, (res) => {
+  let serverPort = 0;
+  child.stdout.on("data", (data) => {
+    const match = data.toString().match(/localhost:(\d+)/);
+    if (match) serverPort = parseInt(match[1]);
+  });
+
+  // Poll until server ready, then load app
+  function check(retries = 120) {
+    if (serverPort > 0) {
+      http.get(`http://localhost:${serverPort}/`, (res) => {
         if (res.statusCode === 200) {
           win.setSize(1280, 800);
           win.center();
           win.setResizable(true);
           win.setMenuBarVisibility(false);
-          win.loadURL(`http://localhost:${p}`);
+          win.loadURL(`http://localhost:${serverPort}`);
         } else if (retries > 0) setTimeout(() => check(retries - 1), 200);
       }).on("error", () => {
         if (retries > 0) setTimeout(() => check(retries - 1), 200);
@@ -37,7 +45,9 @@ app.whenReady().then(() => {
     }
   }
   check();
-});
+}
+
+app.whenReady().then(createWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
