@@ -1,21 +1,23 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, shell } = require("electron");
 const path = require("path");
 const http = require("http");
 
-let win;
+let splashWin = null;
+let mainWin = null;
 
-function createWindow() {
-  // Show splash immediately
-  win = new BrowserWindow({
+function showSplash() {
+  splashWin = new BrowserWindow({
     width: 640,
     height: 400,
     frame: false,
     resizable: false,
-    title: "韵易",
   });
-  win.loadFile(path.join(__dirname, "splash.html"));
+  splashWin.loadFile(path.join(__dirname, "splash.html"));
+}
 
-  // Fork server in background (non-blocking)
+function createWindow() {
+  showSplash();
+
   const { fork } = require("child_process");
   const serverPath = path.join(__dirname, "..", "dist", "server.cjs");
   const child = fork(serverPath, [], { silent: true });
@@ -26,16 +28,23 @@ function createWindow() {
     if (match) serverPort = parseInt(match[1]);
   });
 
-  // Poll until server ready, then load app
   function check(retries = 120) {
     if (serverPort > 0) {
       http.get(`http://localhost:${serverPort}/`, (res) => {
         if (res.statusCode === 200) {
-          win.setSize(1280, 800);
-          win.center();
-          win.setResizable(true);
-          win.setMenuBarVisibility(false);
-          win.loadURL(`http://localhost:${serverPort}`);
+          mainWin = new BrowserWindow({
+            width: 1280,
+            height: 800,
+            title: "韵易",
+            autoHideMenuBar: true,
+          });
+          mainWin.loadURL(`http://localhost:${serverPort}`);
+          mainWin.webContents.setWindowOpenHandler(({ url }) => {
+            shell.openExternal(url);
+            return { action: "deny" };
+          });
+          mainWin.on("closed", () => (mainWin = null));
+          if (splashWin) { splashWin.close(); splashWin = null; }
         } else if (retries > 0) setTimeout(() => check(retries - 1), 200);
       }).on("error", () => {
         if (retries > 0) setTimeout(() => check(retries - 1), 200);

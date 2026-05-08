@@ -1601,12 +1601,12 @@ export const qingZhuoMerge: Rule = (p) => {
 // ---- 所有规则 ----
 export const RULES: NamedRule[] = [
   {
-    name: "幽豪肴与宵豪肴合并",
+    name: "幽部豪肴与宵部豪肴合并",
     stageGroup: "前《切韵》音系至《切韵》音系",
     apply: youXiaoMerge,
     taggerUpdate: (t) => t,
   },
-  { name: "支齐并入脂祭齐", apply: zhiToZhiJi, taggerUpdate: (t) => t },
+  { name: "支部齐并入脂祭部齐", apply: zhiToZhiJi, taggerUpdate: (t) => t },
   {
     name: "益石对立中和",
     stageGroup: "《切韵》音系",

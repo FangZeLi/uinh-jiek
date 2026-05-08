@@ -1039,6 +1039,11 @@ export default function App() {
                                   </span>
                                 </div>
                                 {queryResult && (
+                                  <div style={{ fontSize:12, fontWeight:600, color:"#475569", marginBottom:4 }}>
+                                    查询结果
+                                  </div>
+                                )}
+                                {queryResult && (
                                   <div
                                     style={{
                                       flexShrink: 0,
@@ -1775,6 +1780,7 @@ function DragPanel({
   const containerRef = useRef<HTMLDivElement>(null);
   const [over, setOver] = useState(false);
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
+  const [visualIdx, setVisualIdx] = useState<number | null>(null);
   const [dragMeta, setDragMeta] = useState<{
     side: string;
     idx: number;
@@ -1802,6 +1808,7 @@ function DragPanel({
   const end = (e: React.DragEvent) => {
     setOver(false);
     setInsertIdx(null);
+    setVisualIdx(null);
     setDragMeta(null);
     onDragChange(false);
     (e.currentTarget as HTMLElement).classList.remove("is-dragging");
@@ -1825,9 +1832,11 @@ function DragPanel({
         e.preventDefault();
         e.stopPropagation();
         setOver(true);
-        let idx = calcInsertIdx(e.clientX);
-        if (dragMeta && dragMeta.side === side && dragMeta.idx < idx) idx--;
+        const raw = calcInsertIdx(e.clientX);
+        let idx = raw;
+        if (dragMeta && dragMeta.side === side && dragMeta.idx < raw) idx--;
         setInsertIdx(idx);
+        setVisualIdx(raw);
       }}
       onDragLeave={(e) => {
         const el = containerRef.current;
@@ -1883,7 +1892,7 @@ function DragPanel({
       {ids.flatMap((id, idx) => {
         const t = byId.get(id);
         const items: React.ReactNode[] = [];
-        if (insertIdx === idx)
+        if (visualIdx === idx)
           items.push(<i key={`i-${idx}`} style={insStyle} />);
         const sel = filters[id];
         const active =
@@ -2038,7 +2047,7 @@ function DragPanel({
         );
         return items;
       })}
-      {insertIdx === ids.length && ids.length > 0 && (
+      {visualIdx === ids.length && ids.length > 0 && (
         <i key="i-end" style={insStyle} />
       )}
       {available.length > 0 && (
